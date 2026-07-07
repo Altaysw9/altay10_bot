@@ -6,21 +6,25 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const app = express();
 
-// Antrenman ve Beslenme Komutu
-bot.command('antrenor', async (ctx) => {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const prompt = "Sen profesyonel bir fitness koçusun. Kullanıcıya motive edici bir dille, onun hedeflerine uygun antrenman ve beslenme tavsiyeleri ver.";
+// Hem komutla hem normal mesajla çalışması için
+bot.on('message', async (ctx) => {
+  const text = ctx.message.text ? ctx.message.text.toLowerCase() : '';
   
-  try {
-    const result = await model.generateContent(prompt);
-    ctx.reply(result.response.text());
-  } catch (error) {
-    ctx.reply("Şu an antrenörüm biraz yorgun, lütfen tekrar dene.");
+  if (text.includes('antrenor') || text.includes('/antrenor')) {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = "Sen profesyonel bir fitness koçusun. Kullanıcıya motive edici bir dille, onun hedeflerine uygun antrenman ve beslenme tavsiyeleri ver.";
+    
+    try {
+      const result = await model.generateContent(prompt);
+      ctx.reply(result.response.text());
+    } catch (error) {
+      ctx.reply("Şu an antrenörüm biraz yorgun, lütfen tekrar dene.");
+    }
+  } else {
+    ctx.reply('Selam şef! Antrenman veya beslenme planı için bana "antrenor" yazman yeterli.');
   }
 });
 
-bot.start((ctx) => ctx.reply('Selam şef! /antrenor yazarak benden program isteyebilirsin.'));
 bot.launch();
-
-app.get('/', (req, res) => res.send('Antrenör Bot çalışıyor.'));
+app.get('/', (req, res) => res.send('Antrenör Bot aktif.'));
 app.listen(process.env.PORT || 3000);
