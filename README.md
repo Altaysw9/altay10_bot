@@ -1,0 +1,1 @@
+# altay10_bot
