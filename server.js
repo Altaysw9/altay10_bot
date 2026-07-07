@@ -18,7 +18,9 @@ bot.on('message', async (ctx) => {
       const result = await model.generateContent(prompt);
       ctx.reply(result.response.text());
     } catch (error) {
-      ctx.reply("Şu an antrenörüm biraz yorgun, lütfen tekrar dene.");
+      console.log(error);
+      ctx.reply("Hata oluştu: " + error.message);
+    }
     }
   } else {
     ctx.reply('Selam şef! Antrenman veya beslenme planı için bana "antrenor" yazman yeterli.');
